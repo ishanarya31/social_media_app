@@ -2,7 +2,6 @@
 Auth Cubit: State Management
  */
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/features/auth/domain/auth_repos/auth_repo.dart';
 import 'package:social_media_app/features/auth/domain/entities/app_user.dart';
