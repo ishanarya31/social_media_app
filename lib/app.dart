@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_media_app/features/Storage/data/firebase_storage_repo.dart';
 import 'package:social_media_app/features/auth/data/firebase_auth_repo.dart';
 import 'package:social_media_app/features/auth/presentation/cubits/auth_states.dart';
 import 'package:social_media_app/features/profile/data/firebase_profile_repo.dart';
@@ -31,8 +32,9 @@ Check Auth State
 class MyApp extends StatelessWidget {
   MyApp({super.key});
 
-  final authRepo = FirebaseAuthRepo();
-  final profileRepo = FirebaseProfileRepo();
+  final firebaseAuthRepo = FirebaseAuthRepo();
+  final firebaseProfileRepo = FirebaseProfileRepo();
+  final firebaseStorageRepo = FirebaseStorageRepo();
 
   @override
   Widget build(BuildContext context) {
@@ -44,12 +46,15 @@ class MyApp extends StatelessWidget {
 
         //auth cubit
           BlocProvider<AuthCubit>(
-              create: (context) => AuthCubit(authRepo: authRepo)..checkAuth()
+              create: (context) => AuthCubit(authRepo: firebaseAuthRepo)..checkAuth()
           ),
 
         //profile cubit
           BlocProvider<ProfileCubit>(
-              create: (context) => ProfileCubit(profileRepo: profileRepo))
+              create: (context) => ProfileCubit(
+                profileRepo: firebaseProfileRepo,
+                storageRepo: firebaseStorageRepo,
+              ))
         ],
 
 

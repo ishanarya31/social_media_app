@@ -30,7 +30,7 @@ class FirebaseProfileRepo implements ProfileRepo {
       }
       return null;
     } catch (e) {
-      return null;
+      print(e.toString());
     }
   }
 

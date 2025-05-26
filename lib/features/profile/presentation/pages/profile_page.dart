@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart' show CachedNetworkImage;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/features/auth/domain/entities/app_user.dart';
@@ -73,23 +76,34 @@ class _ProfilePageState extends State<ProfilePage> {
                       const SizedBox(height: 20,),
 
                       //profile pic
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.secondary,
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                        height: 200,
-                        width: 200,
 
-                        child: Padding(
-                          padding: const EdgeInsets.all(25.0),
-                          child: Center(
-                            child: Icon(Icons.person,
-                            size: 100,
-                            color: Theme.of(context).colorScheme.primary,),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.secondary,
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          clipBehavior: Clip.hardEdge,
+                          height: 200,
+                          width: 200,
+                          child: CachedNetworkImage(
+                            imageUrl: user.profileImageUrl,
+                            //loading..
+                            placeholder: (context, url) =>
+                            const CircularProgressIndicator(),
+
+                            //error
+                            errorWidget: (context, url, error) => Icon(
+                              Icons.person,
+                              size: 100,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+
+                            //loaded
+                            imageBuilder: (context, imageProvider) =>
+                                Image(image: imageProvider,
+                                  fit: BoxFit.cover,),
                           ),
                         ),
-                      ),
 
                       const SizedBox(height: 20,),
 
