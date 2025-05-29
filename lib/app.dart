@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/features/Storage/data/firebase_storage_repo.dart';
 import 'package:social_media_app/features/auth/data/firebase_auth_repo.dart';
 import 'package:social_media_app/features/auth/presentation/cubits/auth_states.dart';
+import 'package:social_media_app/features/post/data/firebase_post_repo.dart';
+import 'package:social_media_app/features/post/domain/repos/post_repo.dart';
+import 'package:social_media_app/features/post/presentation/cubits/post_cubit.dart';
 import 'package:social_media_app/features/profile/data/firebase_profile_repo.dart';
 import 'package:social_media_app/features/profile/presentation/cubits/profile_cubit.dart';
 import 'features/auth/presentation/cubits/auth_cubit.dart';
@@ -35,58 +38,63 @@ class MyApp extends StatelessWidget {
   final firebaseAuthRepo = FirebaseAuthRepo();
   final firebaseProfileRepo = FirebaseProfileRepo();
   final firebaseStorageRepo = FirebaseStorageRepo();
+  final firebasePostRepo = FirebasePostRepo();
 
   @override
   Widget build(BuildContext context) {
-
-
     //provide cubits to app
     return MultiBlocProvider(
-        providers: [
-
+      providers: [
         //auth cubit
-          BlocProvider<AuthCubit>(
-              create: (context) => AuthCubit(authRepo: firebaseAuthRepo)..checkAuth()
-          ),
+        BlocProvider<AuthCubit>(
+          create: (context) =>
+              AuthCubit(authRepo: firebaseAuthRepo)..checkAuth(),
+        ),
 
         //profile cubit
-          BlocProvider<ProfileCubit>(
-              create: (context) => ProfileCubit(
-                profileRepo: firebaseProfileRepo,
-                storageRepo: firebaseStorageRepo,
-              ))
-        ],
-
-
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: lightMode,
-          home: BlocConsumer<AuthCubit, AuthState>(
-              builder: (context, authState) {
-
-                print(authState);
-
-                if(authState is Unauthenticated){
-                  return const AuthPage();
-                }
-                if(authState is Authenticated){
-                  return const HomePage();
-                }
-                else{
-                  return const Scaffold(
-                    body: Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                }
-              },
-              listener: (context, state){
-                if(state is AuthError){
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
-                }
-              }
+        BlocProvider<ProfileCubit>(
+          create: (context) => ProfileCubit(
+            profileRepo: firebaseProfileRepo,
+            storageRepo: firebaseStorageRepo,
           ),
-        )
+        ),
+
+        //post cubit
+        BlocProvider<PostCubit>(
+          create: (context) => PostCubit(
+            storageRepo: firebaseStorageRepo,
+            postRepo: firebasePostRepo,
+          ),
+        ),
+      ],
+
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: lightMode,
+        home: BlocConsumer<AuthCubit, AuthState>(
+          builder: (context, authState) {
+            print(authState);
+
+            if (authState is Unauthenticated) {
+              return const AuthPage();
+            }
+            if (authState is Authenticated) {
+              return const HomePage();
+            } else {
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            }
+          },
+          listener: (context, state) {
+            if (state is AuthError) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.message)));
+            }
+          },
+        ),
+      ),
     );
   }
 }

@@ -7,6 +7,12 @@ class FirebaseStorageRepo implements StorageRepo{
 
   final FirebaseStorage storage = FirebaseStorage.instance;
 
+  /*
+
+  FOR PROFILE PICTURES
+
+   */
+
   @override
   Future<String?> uploadProfileImageMobile(String path, String fileName) {
     // TODO: implement uploadProfileImageMobile
@@ -40,4 +46,22 @@ class FirebaseStorageRepo implements StorageRepo{
         return null;
       }
     }
+
+
+    /*
+
+    FOR POST IMAGES
+
+     */
+
+    @override
+  Future<String?> uploadPostImageMobile(String path, String fileName) {
+    // TODO: implement uploadPostImageMobile
+      return _uploadFile(path, fileName, "post_images");
+  }
+
+
+
+
+
 }

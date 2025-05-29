@@ -12,7 +12,7 @@ class ProfileCubit extends Cubit<ProfileState> {
   ProfileCubit({required this.profileRepo, required this.storageRepo})
     : super(ProfileInitial());
 
-  //fetch user profile using repo
+  //fetch user profile using repo -> useful for loading user for profile pages
   Future<void> fetchUserProfile(String uid) async {
     try {
       emit(ProfileLoading());
@@ -28,11 +28,21 @@ class ProfileCubit extends Cubit<ProfileState> {
     }
   }
 
+
+  //return user profile given uid -> for many profiles for posts
+  Future<ProfileUser?> getUserProfile(String uid) async{
+    final user = await profileRepo.fetchUserProfile(uid);
+    return user;
+
+  }
+
+
+
   //update bio/profile picture
   Future<void> updateProfile({
     required String uid,
     String? newBio,
-    String? imageMobilePath
+    String? imageMobilePath,
   }) async {
     emit(ProfileLoading());
     try {
@@ -49,7 +59,10 @@ class ProfileCubit extends Cubit<ProfileState> {
 
       if (imageMobilePath != null) {
         try {
-          imageDownloadUrl = await storageRepo.uploadProfileImageMobile(imageMobilePath, uid);
+          imageDownloadUrl = await storageRepo.uploadProfileImageMobile(
+            imageMobilePath,
+            uid,
+          );
 
           if (imageDownloadUrl == null) {
             emit(ProfileError("Failed to upload image"));
@@ -71,7 +84,6 @@ class ProfileCubit extends Cubit<ProfileState> {
 
       //re-fetch the updated profile
       await fetchUserProfile(uid);
-
     } catch (e) {
       emit(ProfileError("Error updating Profile: $e"));
     }

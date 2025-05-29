@@ -64,6 +64,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
         SnackBar(content: Text('Failed to update profile: $e')),
       );
     }
+
+    @override
+    void dispose(){
+      bioTextController.dispose();
+      super.dispose();
+    }
+
   }
 
   @override
