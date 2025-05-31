@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
-import 'package:social_media_app/features/home/presentation/components/post_tile.dart';
+import 'package:social_media_app/features/post/Components/post_tile.dart';
 import 'package:social_media_app/features/post/presentation/cubits/post_cubit.dart';
 import 'package:social_media_app/features/post/presentation/cubits/post_state.dart';
+import 'package:social_media_app/features/profile/presentation/cubits/profile_cubit.dart';
+import '../../../auth/domain/entities/app_user.dart';
 import '../../../post/domain/entities/post.dart';
-import '../../../post/presentation/pages/upload_post_page.dart';
-import '../components/my_drawer.dart';
+import '../../../profile/domain/entities/profile_user.dart';
+
 
 class SwipeDeckPage extends StatefulWidget {
   const SwipeDeckPage({Key? key}) : super(key: key);
@@ -16,7 +18,9 @@ class SwipeDeckPage extends StatefulWidget {
 }
 
 class _SwipeDeckPageState extends State<SwipeDeckPage> {
-  late final PostCubit postCubit;
+  //cubits
+  late final postCubit = context.read<PostCubit>();
+  late final profileCubit = context.read<ProfileCubit>();
   late CardSwiperController controller;
 
   // Track which posts have been seen to enable infinite loop
@@ -26,7 +30,6 @@ class _SwipeDeckPageState extends State<SwipeDeckPage> {
   @override
   void initState() {
     super.initState();
-    postCubit = context.read<PostCubit>();
     controller = CardSwiperController();
 
     // Fetch all posts on startup
@@ -42,6 +45,7 @@ class _SwipeDeckPageState extends State<SwipeDeckPage> {
   void fetchAllPosts() {
     postCubit.fetchAllPosts();
   }
+
 
   void deletePost(String postId) {
     postCubit.deletePost(postId);
@@ -66,16 +70,9 @@ class _SwipeDeckPageState extends State<SwipeDeckPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Swipe Posts"),
+        title: const Text("Swipe View!"),
         foregroundColor: Theme.of(context).colorScheme.primary,
         actions: [
-          IconButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const UploadPostPage()),
-            ),
-            icon: const Icon(Icons.add),
-          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
@@ -90,8 +87,6 @@ class _SwipeDeckPageState extends State<SwipeDeckPage> {
         ],
       ),
 
-      // Menu drawer - same as HomePage
-      drawer: const MyDrawer(),
 
       // Body with BlocBuilder like HomePage
       body: BlocBuilder<PostCubit, PostState>(
@@ -171,16 +166,18 @@ class _SwipeDeckPageState extends State<SwipeDeckPage> {
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(12),
+
+
                               child: PostTile(
                                 post: post,
-                                onDeletePressed: () => deletePost(post.id),
+                                onDeletePressed: (){},
                               ),
                             ),
                           );
                         },
-                        numberOfCardsDisplayed: 3,
-                        backCardOffset: const Offset(0, -40),
-                        padding: const EdgeInsets.all(8.0),
+                        numberOfCardsDisplayed: 4,
+                        backCardOffset: const Offset(0, -34),
+                        padding: const EdgeInsets.all(2.0),
                         allowedSwipeDirection: const AllowedSwipeDirection.symmetric(
                           horizontal: true,
                           vertical: true,

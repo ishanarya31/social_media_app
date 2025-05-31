@@ -67,6 +67,8 @@ class _UploadPostPageState extends State<UploadPostPage> {
       userId: currentUser!.uid,
       userName: currentUser!.name,
       timeStamp: DateTime.now(),
+      likes: [],
+      comments: [],
     );
 
     //post cubit to create new post

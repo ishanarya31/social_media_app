@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_media_app/features/Storage/domain/storage_repo.dart';
+import 'package:social_media_app/features/post/domain/entities/comment.dart';
 import 'package:social_media_app/features/post/domain/repos/post_repo.dart';
 import 'package:social_media_app/features/post/presentation/cubits/post_state.dart';
 
@@ -105,4 +106,39 @@ class PostCubit extends Cubit<PostState>{
       emit(PostsError("Failed to delete post: $e"));
     }
   }
+
+
+  Future<void> toggleLikePost(String postId, String userId) async{
+    try{
+      await postRepo.toggleLikePost(postId, userId);
+    }
+    catch(e){
+      emit(PostsError("Unable to like $e"));
+    }
+
+  }
+
+  //add a comment
+  Future<void> addComment(String postId , Comment comment) async{
+    try{
+      await postRepo.addComment(postId, comment);
+      fetchAllPosts();
+    }
+    catch(e){
+      emit(PostsError("Failed to add comment: $e"));
+    }
+  }
+
+  //delete a comment
+  Future<void> deleteComment(String postId, String commentId) async{
+    try{
+      await postRepo.deleteComment(postId, commentId);
+      await fetchAllPosts();
+    }
+    catch(e){
+      emit(PostsError("Failed to delete comment: $e"));
+    }
+  }
+
+
 }

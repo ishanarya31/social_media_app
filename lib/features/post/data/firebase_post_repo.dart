@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:social_media_app/features/post/domain/repos/post_repo.dart';
 
+import '../domain/entities/comment.dart';
 import '../domain/entities/post.dart';
 
 class FirebasePostRepo implements PostRepo{
@@ -120,5 +121,96 @@ class FirebasePostRepo implements PostRepo{
       print("Stack trace: $stackTrace");
       throw Exception("Error fetching your posts: $e");
     }
+  }
+
+  @override
+  Future<void> toggleLikePost(String postId, String userId) async {
+    // TODO: implement toggleLikePost
+    try{
+      final postDoc = await postsCollection.doc(postId).get();
+
+      if(!postDoc.exists) return;
+
+      final post = Post.fromJson(postDoc.data() as Map<String , dynamic>);
+
+      //check if user has already liked this post
+      final hasLiked = post.likes.contains(userId);
+
+      //update the liked posts
+      if(hasLiked){
+        post.likes.remove(userId);
+      }
+      else{
+        post.likes.add(userId);
+      }
+
+      //update the new document with new liked list
+      await postsCollection.doc(postId).update({
+        'likes': post.likes,
+      });
+    }
+    catch(e){
+      throw Exception("Error toggling like $e");
+    }
+  }
+
+  @override
+  Future<void> addComment(String postId, Comment comment) async {
+    // TODO: implement addComment
+    try{
+      //get post document
+      final postDoc = await postsCollection.doc(postId).get();
+
+      if(postDoc.exists){
+        //convert json -> post
+        final post = Post.fromJson(postDoc.data() as Map<String , dynamic>);
+
+        //add comment in the comments list of post
+        post.comments.add(comment);
+
+        //update firestore
+        await postsCollection.doc(postId).update({
+          'comments' : post.comments.map((comment) => comment.toJson()).toList(),
+        });
+      }
+
+      else{
+        throw Exception("Post not found!");
+      }
+
+    }
+    catch(e){
+      throw Exception("Error adding your comment $e");
+    }
+  }
+
+  @override
+  Future<void> deleteComment(String postId, String commentId) async {
+    // TODO: implement deleteComment
+    //get post document
+
+    try{
+      final postDoc = await postsCollection.doc(postId).get();
+
+      if(postDoc.exists) {
+        final post = Post.fromJson(postDoc.data() as Map<String, dynamic>);
+
+        post.comments.removeWhere((comment) => comment.id == commentId);
+
+        //update firestore
+        await postsCollection.doc(postId).update({
+          'comments': post.comments.map((comment) => comment.toJson()).toList(),
+        });
+      }
+
+      else{
+        throw Exception("Post not found!");
+      }
+    }
+
+    catch(e){
+      throw Exception("Error deleting post: $e");
+    }
+
   }
 }
